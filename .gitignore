@@ -1,0 +1,61 @@
+# Python cache
+pycache/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# SQLite
+*.sqlite3
+
+# Temporary files
+/tmp/
+/tmp/*
+
+# Uploaded PDFs
+input.pdf
+output.pdf
+*.pdf
+
+# Docker
+*.tar
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Build files
+build/
+dist/
+*.egg-info/
+
+# Mypy cache
+.mypy_cache/
+
+# Pytest cache
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sandbox job folders
+/tmp/*
