@@ -17,20 +17,28 @@ submitBtn.addEventListener("click", async () => {
     statusDiv.innerText = "Processing...";
 
     try {
-        const response = await fetch("http://localhost:8000/process", {
+        const response = await fetch("http://127.0.0.1:8000/process", {
             method: "POST",
             body: formData
         });
 
-        const data = await response.json();
-
-        if (data.status === "success") {
-            statusDiv.innerText = "PDF processed successfully!";
-        } else {
-            statusDiv.innerText = "Error occurred.";
+        if (!response.ok) {
+            throw new Error("Server error");
         }
 
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "edited.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        statusDiv.innerText = "Download started!";
+
     } catch (error) {
-        statusDiv.innerText = "Server error.";
+        statusDiv.innerText = "Error processing PDF.";
     }
 });

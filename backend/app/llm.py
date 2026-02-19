@@ -1,26 +1,43 @@
-from openai import OpenAI
-from .config import OPENAI_API_KEY
+import google.generativeai as genai
+from .config import GEMINI_API_KEY
+import re
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 SYSTEM_PROMPT = """
-You are a professional PDF automation Python expert.
-Generate ONLY safe Python code.
-Use ONLY PyMuPDF (fitz).
-Never use os, sys, subprocess, socket, eval, exec, or file operations.
-Input file is 'input.pdf'
-Output file must be 'output.pdf'
-Do not explain anything. Only return Python code.
+You are a Python PDF editing assistant.
+
+Strict rules:
+- Use ONLY PyMuPDF (import fitz)
+- Do NOT import os
+- Do NOT import sys
+- Do NOT use subprocess
+- Do NOT use socket
+- Do NOT use eval or exec
+- Open file strictly as: fitz.open("input.pdf")
+- Save file strictly as: doc.save("output.pdf")
+- Do NOT use any file system operations
+- Do NOT use absolute paths
+- Output ONLY raw Python code
+- No explanations
 """
 
 def generate_code(user_prompt: str):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.2,
-    )
+    full_prompt = SYSTEM_PROMPT + "\nUser instruction:\n" + user_prompt
 
-    return response.choices[0].message.content
+    response = model.generate_content(full_prompt)
+    code = response.text.strip()
+
+    # 🔥 Remove triple backticks and language tags
+    code = re.sub(r"```.*?\n","",code)
+    code = code.replace("```", "")
+
+    # 🔥 Remove standalone 'python' if present
+    lines = code.split("\n")
+    if lines and lines[0].strip().lower() == "python":
+        lines = lines[1:]
+
+    code = "\n".join(lines)
+
+    return code.strip()

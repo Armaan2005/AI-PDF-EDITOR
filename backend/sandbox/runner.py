@@ -1,16 +1,8 @@
 import os
-import sys
-import signal
 
-def timeout_handler(signum, frame):
-    raise TimeoutError("Execution timed out")
+os.chdir("/data")
 
-signal.signal(signal.SIGALRM, timeout_handler)
-signal.alarm(5)
-
-script_path = "/app/script.py"
-
-with open(script_path) as f:
+with open("script.py") as f:
     code = f.read()
 
 exec(code)

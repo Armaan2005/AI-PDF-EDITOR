@@ -1,26 +1,58 @@
-from fastapi import FastAPI, UploadFile, File, Form
-import shutil
-import os
-
+from fastapi.responses import FileResponse
+from fastapi import FastAPI,UploadFile,File,Form
 from .llm import generate_code
 from .validator import validate_code
 from .executor import execute_in_sandbox
+import uuid
+import os
+import shutil
 
-app = FastAPI()
+app=FastAPI()
+
+from fastapi.responses import FileResponse
+from fastapi import BackgroundTasks
 
 @app.post("/process")
 async def process_pdf(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     prompt: str = Form(...)
 ):
-    input_path = "input.pdf"
-    with open(input_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    try:
+        job_id = str(uuid.uuid4())
+        job_dir = f"./sandbox_jobs/{job_id}"
+        os.makedirs(job_dir, exist_ok=True)
 
-    code = generate_code(prompt)
+        input_path = os.path.join(job_dir, "input.pdf")
+        with open(input_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-    validate_code(code)
+        code = generate_code(prompt)
+        validate_code(code)
 
-    output_path = execute_in_sandbox(code)
+        output_path = execute_in_sandbox(code, job_dir)
 
-    return {"status": "success", "output": output_path}
+        if not os.path.exists(output_path):
+            raise Exception("Output file not created")
+
+        # 🔥 Auto cleanup after response
+        background_tasks.add_task(shutil.rmtree, job_dir)
+
+        return FileResponse(
+            path=output_path,
+            filename="edited.pdf",
+            media_type="application/pdf"
+        )
+
+    except Exception as e:
+        return {"error": str(e)}
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
