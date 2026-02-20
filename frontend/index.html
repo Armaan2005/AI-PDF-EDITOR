@@ -1,23 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>AI PDF Sandbox</title>
+    <title>AI PDF Studio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <h1>AI PDF Editor</h1>
-    <p>Upload your PDF and describe the changes in Hindi or English.</p>
+<div class="background"></div>
 
-    <input type="file" id="fileInput" accept="application/pdf">
-    
-    <textarea id="promptInput" placeholder="Example: Har page ka background blue kar do..."></textarea>
+<div class="card">
+    <h1>AI PDF Studio </h1>
 
-    <button id="submitBtn">Process PDF</button>
+    <div class="upload-area" id="uploadArea">
+        <input type="file" id="pdfFile" accept="application/pdf" hidden>
+        <p id="uploadText">Drag & Drop PDF or Click to Upload</p>
+    </div>
 
+    <textarea id="prompt" placeholder="Describe what you want to edit..."></textarea>
+
+    <button type="button" onclick="processPDF()">Generate</button>
+
+    <div id="loader" class="loader hidden"></div>
     <div id="status"></div>
+    <iframe id="previewFrame" class="hidden"></iframe>
 </div>
 
 <script src="script.js"></script>

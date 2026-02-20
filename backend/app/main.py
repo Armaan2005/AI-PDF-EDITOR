@@ -36,7 +36,7 @@ async def process_pdf(
             raise Exception("Output file not created")
 
         # 🔥 Auto cleanup after response
-        background_tasks.add_task(shutil.rmtree, job_dir)
+        # background_tasks.add_task(shutil.rmtree, job_dir)
 
         return FileResponse(
             path=output_path,
