@@ -48,35 +48,35 @@ def generate_code(user_prompt: str):
     attempts = 0
     code = ""
 
-    # 🔄 API ROTATION LOOP 
+    
     while attempts < total_keys:
         try:
             current_key = GEMINI_API_KEYS_LIST[current_key_index]
             genai.configure(api_key=current_key)
             
-            # 🔥 Using the smartest model for coding & reasoning
+            
             model = genai.GenerativeModel("gemini-2.5-flash")
 
             response = model.generate_content(full_prompt)
             code = response.text.strip()
             
-            print(f"✅ Success with API Key Index: {current_key_index}")
+            print(f" Success with API Key Index: {current_key_index}")
             break 
 
         except Exception as e:
             error_msg = str(e)
             if "429" in error_msg or "Quota" in error_msg or "exhausted" in error_msg.lower():
-                print(f"⚠️ Key index {current_key_index} ki limit khatam. Switching to next key...")
+                print(f" Key index {current_key_index} ki limit khatam. Switching to next key...")
                 current_key_index = (current_key_index + 1) % total_keys
                 attempts += 1
             else:
-                print(f"❌ API Error (Not Quota limit): {error_msg}")
+                print(f" API Error (Not Quota limit): {error_msg}")
                 raise e
 
     if attempts == total_keys:
         raise Exception("429 Quota Exceeded: Bhai, saari API keys ki limit khatam ho gayi hai!")
 
-    # 🔥 Clean the output (Remove markdown formatting)
+    
     code = re.sub(r"^```python\n", "", code, flags=re.IGNORECASE)
     code = re.sub(r"^```\n","",code)
     code = re.sub(r"```$","",code)

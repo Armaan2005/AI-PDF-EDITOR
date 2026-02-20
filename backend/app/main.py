@@ -6,6 +6,7 @@ from .executor import execute_in_sandbox
 import uuid
 import os
 import shutil
+import uvicorn
 
 app=FastAPI()
 
@@ -35,8 +36,7 @@ async def process_pdf(
         if not os.path.exists(output_path):
             raise Exception("Output file not created")
 
-        # 🔥 Auto cleanup after response
-        # background_tasks.add_task(shutil.rmtree, job_dir)
+       
 
         return FileResponse(
             path=output_path,
@@ -56,3 +56,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if __name__=="__main__":
+    uvicorn.run(app,host="0.0.0.0",port=7860)

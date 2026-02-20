@@ -5,12 +5,12 @@ const loader = document.getElementById("loader");
 const status = document.getElementById("status");
 const previewFrame = document.getElementById("previewFrame");
 
-// File picker open
+
 uploadArea.addEventListener("click", () => {
     fileInput.click();
 });
 
-// File selected
+
 fileInput.addEventListener("change", () => {
     if (fileInput.files.length > 0) {
         uploadText.innerText = "📄 " + fileInput.files[0].name;
@@ -18,7 +18,7 @@ fileInput.addEventListener("change", () => {
 });
 
 async function processPDF(event) {
-    // 1. Page refresh hone se rokne ke liye
+    
     if (event) event.preventDefault(); 
 
     if (!fileInput.files[0]) {
@@ -36,24 +36,24 @@ async function processPDF(event) {
     loader.classList.remove("hidden");
     status.innerText = "Processing... Please wait.";
     status.style.color = "white"; 
-    previewFrame.classList.add("hidden"); // Puraana preview hide kar do
+    previewFrame.classList.add("hidden"); 
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/process", {
+        const response = await fetch("https://armaan2005-ai-pdf-studio.hf.space/process", {
             method: "POST",
             body: formData
         });
 
-        // 🛑 SMART CHECK: Kya response JSON (Error) hai?
+        
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
             const errorData = await response.json();
             loader.classList.add("hidden");
             
-            // Error ko status mein show karo (laal rang mein)
+            
             status.innerText = "API Error: " + (errorData.error || "Quota limit exceeded or backend error.");
             status.style.color = "#ff4d4d"; // Red color
-            return; // Yahan se aage mat badho
+            return; 
         }
 
         if (!response.ok) {
@@ -63,15 +63,15 @@ async function processPDF(event) {
             return;
         }
 
-     // ✅ Agar sab theek hai, toh PDF load karo
+    
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
 
-        // 1. SHOW PREVIEW
+       
         previewFrame.src = url;
         previewFrame.classList.remove("hidden");
 
-        // 2. 🛑 AUTO DOWNLOAD (Yeh wapas add kar diya)
+        
         const a = document.createElement("a");
         a.href = url;
         a.download = "edited.pdf";
@@ -79,14 +79,14 @@ async function processPDF(event) {
         a.click();
         document.body.removeChild(a);
 
-        // 3. SUCCESS MESSAGE
+        
         loader.classList.add("hidden");
         status.innerText = "✨ PDF Generated & Downloaded Successfully!";
         status.style.color = "#00c896";
 
         loader.classList.add("hidden");
         status.innerText = "✨ PDF Generated Successfully!";
-        status.style.color = "#00c896"; // Green color
+        status.style.color = "#00c896"; 
 
     } catch (err) {
         loader.classList.add("hidden");
