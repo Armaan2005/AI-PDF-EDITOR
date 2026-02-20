@@ -9,6 +9,7 @@
 AI PDF Studio is an advanced, LLM-powered document processing tool that allows users to edit, redact, and manipulate PDF files using natural language prompts. Instead of rigid UI buttons, it dynamically generates and executes Python code in a secure sandboxed environment to perform highly custom PDF operations.
 
 🚀 Live Demo: https://ai-pdf-editor-alpha.vercel.app/
+
 ⚙️ Backend API Status: Hosted on [Hugging Face Spaces]https://armaan2005-ai-pdf-studio.hf.space/docs
 
 ## ✨ Key Features
@@ -95,4 +96,5 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 👨‍💻 Developed By
 Armaan Joshi * Passionate about Deep Learning, Computer Vision, and MLOps.
 * [LinkedIn](Insert your LinkedIn Link) | [GitHub](https://github.com/Armaan2005)
+
 
