@@ -71,7 +71,7 @@ This project follows production-grade software engineering practices:
 If you want to run this project locally, follow these steps:
 
 ### 1. Clone the repository
-    git clone [https://github.com/Armaan2005/AI-PDF-EDITOR.git](https://github.com/Armaan2005/AI-PDF-EDITOR.git)
+    git clone https://github.com/Armaan2005/AI-PDF-EDITOR.git
     cd AI-PDF-EDITOR
 
 ### 2. Backend Setup
@@ -96,5 +96,6 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 ## 👨‍💻 Developed By
 Armaan Joshi * Passionate about Deep Learning, Computer Vision, and MLOps.
 * [LinkedIn](Insert your LinkedIn Link) | [GitHub](https://github.com/Armaan2005)
+
 
 
