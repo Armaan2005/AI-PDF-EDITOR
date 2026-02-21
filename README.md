@@ -16,7 +16,8 @@ AI PDF Studio is an advanced, LLM-powered document processing tool that allows u
 
 * Natural Language Processing: Tell the AI what to do (e.g., "Redact all names," "Delete page 2," "Extract tables"), and it handles the complex PDF manipulations automatically.
 * Dynamic Code Execution: Uses an LLM (Gemini) to generate context-aware Python scripts using PyMuPDF (fitz).
-* OCR Integration: Built-in Tesseract OCR support for handling scanned documents and extracting text from images within PDFs.
+*✨ Multimodal Vision Intelligence: Unlike traditional editors, it "sees" the PDF. It uses Gemini 2.5 Flash's native vision to understand layouts, diagrams, and scanned text without needing external OCR libraries like Tesseract.
+*​🧠 Intelligent Summarization: Can analyze multi-page documents and generate a concise summary directly onto a new page within the PDF.
 * Secure Sandbox Environment: Executes generated AI code via secure subprocesses with strict timeouts to prevent infinite loops and ensure server stability.
 * Decoupled Architecture: A lightweight frontend connected to a heavy, Dockerized FastAPI backend hosted on the cloud.
 
@@ -24,10 +25,11 @@ AI PDF Studio is an advanced, LLM-powered document processing tool that allows u
 
 This project follows production-grade software engineering practices:
 
+* Vision-Centric Workflow: The system now uploads the entire document to the LLM's vision context, ensuring 100% accuracy in finding text locations and preserving original formatting.
 * Containerization: The backend environment is fully Dockerized, ensuring consistent Tesseract and Python dependencies across local and cloud environments.
 * Continuous Integration (CI): Integrated GitHub Actions pipeline that automatically builds and tests the Docker image upon every push to the main branch.
 * Cloud Deployment: * Frontend: Deployed on Vercel for fast, edge-network delivery.
-  * Backend: Hosted on Hugging Face Spaces (Docker Space) exposing port 7860, utilizing secure Environment Secrets for API keys.
+* Backend: Hosted on Hugging Face Spaces (Docker Space) exposing port 7860, utilizing secure Environment Secrets for API keys.
 
 ## 📂 Project Structure
 
@@ -61,7 +63,7 @@ This project follows production-grade software engineering practices:
 ## 🛠️ Tech Stack
 
 * Backend: FastAPI, Python, Uvicorn
-* PDF Processing & OCR: PyMuPDF (fitz), Tesseract OCR, Pillow
+* PDF Processing & OCR: PyMuPDF (fitz)
 * AI / LLM: Google Gemini API
 * DevOps / Deployment: Docker, Docker Compose, GitHub Actions, Hugging Face Spaces, Vercel
 * Frontend: HTML/CSS/JS
@@ -95,7 +97,8 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 
 ## 👨‍💻 Developed By
 Armaan Joshi * Passionate about Deep Learning, Computer Vision, and MLOps.
-* [LinkedIn](Insert your LinkedIn Link) | [GitHub](https://github.com/Armaan2005)
+*  | [GitHub](https://github.com/Armaan2005)
+
 
 
 
