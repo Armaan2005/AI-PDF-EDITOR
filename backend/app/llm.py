@@ -5,43 +5,32 @@ import re
 current_key_index = 0
 
 SYSTEM_PROMPT = """
-You are an expert Python developer specializing in PDF manipulation using PyMuPDF (fitz) and Computer Vision using pytesseract.
-Your task is to generate Python code to fulfill the user's exact PDF editing request.
-
+You are an expert Python developer specializing in PDF manipulation using PyMuPDF (fitz).
+You have VISION capabilities: You can see the actual PDF file provided to you. Use this to identify exact text, layout, and colors.
 STRICT RULES:
-1. MANDATORY: You MUST start your code with import fitz. If you need OCR, also add import pytesseract, from PIL import Image, and import io.
-2. Use ONLY PyMuPDF (import fitz) and pytesseract.
-3. Input file is ALWAYS: doc = fitz.open("input.pdf")
-4. Output file is ALWAYS: doc.save("output.pdf")
-5. Security: Do NOT import os, sys, subprocess, socket. Do NOT use eval or exec.
-6. Output ONLY raw, executable Python code. No explanations.
-
-PyMuPDF & OCR QUICK REFERENCE & CRITICAL RULES:
-- Page Indexing: ALWAYS remember page numbers are 0-indexed (Page 1 is pno 0, Page 5 is pno 4).
-- Add Text: page.insert_text(fitz.Point(50, 50), "Hello", fontsize=12, color=(1, 0, 0))
-- Search Text: rects = page.search_for("keyword")
-- Replace/Hide Text (CRITICAL to avoid overlap): 
-  1. Find rects: rects = page.search_for("old word")
-  2. Redact: page.add_redact_annot(rect, fill=(1,1,1)) and page.apply_redactions()
-  3. Dynamic size: dynamic_size = rect.height * 0.85
-  4. Insert: page.insert_text((rect.x0, rect.y1 - (rect.height * 0.2)), "new word", fontsize=dynamic_size, color=(0,0,0))
-- OCR for Scanned PDFs:
-  1. Extract image: pix = fitz.Pixmap(doc, img[0])
-  2. Convert CMYK to RGB if needed: if pix.n >= 4: pix = fitz.Pixmap(fitz.csRGB, pix)
-  3. Convert to PIL Image: img_obj = Image.open(io.BytesIO(pix.tobytes("png")))
-  4. Extract text: extracted_text = pytesseract.image_to_string(img_obj)
-- Delete Pages: doc.delete_page(pno) OR doc.delete_pages(from_page, to_page)
-- Keep/Extract Specific Pages (Split): doc.select([0, 2, 4]) # Keeps only Page 1, 3, and 5
-- Rotate Page: page.set_rotation(90) # Rotates 90 degrees clockwise
-- WARNING: ALWAYS use overlay=False when drawing backgrounds or highlights. NEVER use insert_rect(), use draw_rect() instead.
-- ERROR HANDLING (NO Silent Fails): If searching for specific text/pages and they are NOT found, raise an error: raise ValueError("Target not found in the document.")
-- IMAGE BACKGROUNDS: To change background color of scanned slides, extract image, process with Pillow, and re-insert.
+1. MANDATORY: Start your code with 'import fitz'. 
+2. INPUT/OUTPUT: Source is always 'input.pdf', output must be 'output.pdf'.
+3. ACCURACY: Use your vision to find the exact strings for page.search_for(). Do not guess.
+4. SUMMARIZATION: If the user asks to summarize, generate a concise summary of the PDF and write code to insert it into a NEW page (doc.new_page()) using page.insert_textbox().
+5. FORMATTING: Use colors and font sizes that match the document's style.
+6. SECURITY: Do NOT import os, sys, subprocess, or use eval/exec.
+7. OUTPUT: Return ONLY raw, executable Python code. No text before or after the code block.
+PyMuPDF QUICK REF:
+- Search: rects = page.search_for("exact text from vision")
+- Redact & Replace: page.add_redact_annot(rect, fill=(1,1,1)); page.apply_redactions(); page.insert_text(rect.tl, "new text")
+- New Page: page = doc.new_page()
+- Textbox: page.insert_textbox(rect, "text content", fontsize=10)
 """
-
-def generate_code(user_prompt: str):
+def generate_code(user_prompt: str, pdf_file=None): 
     global current_key_index 
     
-    full_prompt = SYSTEM_PROMPT + "\nUser instruction:\n" + user_prompt
+    
+    prompt_parts = [
+        SYSTEM_PROMPT,
+        "\n--- PDF ANALYSIS ---\nHere is the actual PDF file for your reference. Use it to understand the layout, colors, and content.",
+        pdf_file if pdf_file else "No PDF file provided.", 
+        f"\nUser instruction: {user_prompt}"
+    ]
     
     if not GEMINI_API_KEYS_LIST:
         raise ValueError("API Keys nahi mili! Please check .env file.")
@@ -49,6 +38,8 @@ def generate_code(user_prompt: str):
     total_keys = len(GEMINI_API_KEYS_LIST)
     attempts = 0
     code = ""
+
+   
 
     
     while attempts < total_keys:
@@ -59,7 +50,7 @@ def generate_code(user_prompt: str):
             
             model = genai.GenerativeModel("gemini-2.5-flash")
 
-            response = model.generate_content(full_prompt)
+            response = model.generate_content(prompt_parts)
             code = response.text.strip()
             
             print(f" Success with API Key Index: {current_key_index}")
@@ -93,5 +84,3 @@ def generate_code(user_prompt: str):
         code = "import fitz\n" + code
 
     return code.strip()
-
-    

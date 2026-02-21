@@ -1,13 +1,14 @@
 from fastapi.responses import FileResponse
 from fastapi import FastAPI,UploadFile,File,Form
-from .llm import generate_code
-from .validator import validate_code
-from .executor import execute_in_sandbox
+from llm import generate_code
+from validator import validate_code
+from executor import execute_in_sandbox
 import uuid
 import os
 import shutil
 import uvicorn
-
+import fitz
+import google.generativeai as genai
 app=FastAPI()
 
 from fastapi.responses import FileResponse
@@ -28,7 +29,27 @@ async def process_pdf(
         with open(input_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
-        code = generate_code(prompt)
+       
+        try:
+            
+            from llm import GEMINI_API_KEYS_LIST, current_key_index
+            genai.configure(api_key=GEMINI_API_KEYS_LIST[current_key_index])
+
+            
+            uploaded_file = genai.upload_file(path=input_path, display_name=f"job_{job_id}")
+            
+           
+            code = generate_code(prompt, uploaded_file)
+            
+            
+            genai.delete_file(uploaded_file.name)
+            
+        except Exception as e:
+            print(f"Vision Upload Error: {e}")
+            
+            code = generate_code(prompt, None)
+        
+        
         validate_code(code)
 
         output_path = execute_in_sandbox(code, job_dir)

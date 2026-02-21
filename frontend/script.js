@@ -32,7 +32,7 @@ async function processPDF(event) {
     formData.append("file", fileInput.files[0]);
     formData.append("prompt", prompt);
 
-    // UI Reset for new request
+    
     loader.classList.remove("hidden");
     status.innerText = "Processing... Please wait.";
     status.style.color = "white"; 
@@ -52,7 +52,7 @@ async function processPDF(event) {
             
             
             status.innerText = "API Error: " + (errorData.error || "Quota limit exceeded or backend error.");
-            status.style.color = "#ff4d4d"; // Red color
+            status.style.color = "#ff4d4d"; 
             return; 
         }
 
