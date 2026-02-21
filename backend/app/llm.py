@@ -1,5 +1,5 @@
 import google.generativeai as genai
-from .config import GEMINI_API_KEYS_LIST
+from config import GEMINI_API_KEYS_LIST
 import re
 
 current_key_index = 0
@@ -20,11 +20,11 @@ PyMuPDF & OCR QUICK REFERENCE & CRITICAL RULES:
 - Page Indexing: ALWAYS remember page numbers are 0-indexed (Page 1 is pno 0, Page 5 is pno 4).
 - Add Text: page.insert_text(fitz.Point(50, 50), "Hello", fontsize=12, color=(1, 0, 0))
 - Search Text: rects = page.search_for("keyword")
-- Replace/Hide Text: 
+- Replace/Hide Text (CRITICAL to avoid overlap): 
   1. Find rects: rects = page.search_for("old word")
   2. Redact: page.add_redact_annot(rect, fill=(1,1,1)) and page.apply_redactions()
   3. Dynamic size: dynamic_size = rect.height * 0.85
-  4. Insert: page.insert_text((rect.x0, rect.y1 - (rect.height * 0.2)), "new word", fontsize=dynamic_size)
+  4. Insert: page.insert_text((rect.x0, rect.y1 - (rect.height * 0.2)), "new word", fontsize=dynamic_size, color=(0,0,0))
 - OCR for Scanned PDFs:
   1. Extract image: pix = fitz.Pixmap(doc, img[0])
   2. Convert CMYK to RGB if needed: if pix.n >= 4: pix = fitz.Pixmap(fitz.csRGB, pix)
@@ -33,7 +33,9 @@ PyMuPDF & OCR QUICK REFERENCE & CRITICAL RULES:
 - Delete Pages: doc.delete_page(pno) OR doc.delete_pages(from_page, to_page)
 - Keep/Extract Specific Pages (Split): doc.select([0, 2, 4]) # Keeps only Page 1, 3, and 5
 - Rotate Page: page.set_rotation(90) # Rotates 90 degrees clockwise
-- WARNING: ALWAYS use overlay=False when drawing backgrounds or highlights.
+- WARNING: ALWAYS use overlay=False when drawing backgrounds or highlights. NEVER use insert_rect(), use draw_rect() instead.
+- ERROR HANDLING (NO Silent Fails): If searching for specific text/pages and they are NOT found, raise an error: raise ValueError("Target not found in the document.")
+- IMAGE BACKGROUNDS: To change background color of scanned slides, extract image, process with Pillow, and re-insert.
 """
 
 def generate_code(user_prompt: str):
